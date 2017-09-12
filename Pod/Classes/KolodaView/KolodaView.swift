@@ -12,7 +12,7 @@ import pop
 //Default values
 private let defaultCountOfVisibleCards = 3
 private let defaultBackgroundCardsTopMargin: CGFloat = 4.0
-private let defaultBackgroundCardsScalePercent: CGFloat = 0.95
+private let defaultBackgroundCardsScalePercent: CGFloat = 0.9
 private let defaultBackgroundCardsLeftMargin: CGFloat = 8.0
 private let defaultBackgroundCardFrameAnimationDuration: TimeInterval = 0.2
 private let defaultAppearanceAnimationDuration: TimeInterval = 0.8
@@ -180,17 +180,16 @@ open class KolodaView: UIView, DraggableCardDelegate {
     
     // MARK: Frames
     open func frameForCard(at index: Int) -> CGRect {
-        let bottomOffset: CGFloat = 0
+        let bottomOffset: CGFloat = 0.0
         let topOffset = defaultBackgroundCardsTopMargin * CGFloat(countOfVisibleCards - 1)
         let scalePercent = defaultBackgroundCardsScalePercent
         let width = self.frame.width * pow(scalePercent, CGFloat(index))
         let xOffset = (self.frame.width - width) / 2
         let height = (self.frame.height - bottomOffset - topOffset) * pow(scalePercent, CGFloat(index))
-        let multiplier: CGFloat = index > 0 ? 1.0 : 0.0
-        let prevCardFrame = index > 0 ? frameForCard(at: max(index - 1, 0)) : .zero
-        let yOffset = (prevCardFrame.height - height + prevCardFrame.origin.y + defaultBackgroundCardsTopMargin) * multiplier
+        let lastIndex = countOfVisibleCards - 1
+        let multiplier: CGFloat = index == lastIndex ? 0.0 : 1.0
+        let yOffset = topOffset * CGFloat(countOfVisibleCards - index - 1) * multiplier
         let frame = CGRect(x: xOffset, y: yOffset, width: width, height: height)
-        
         return frame
     }
     

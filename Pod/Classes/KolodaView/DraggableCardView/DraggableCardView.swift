@@ -106,6 +106,11 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
             cardSwipeActionAnimationDuration = delegate.card(cardSwipeSpeed: self).rawValue
         }
     }
+
+    public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let velocity = panGestureRecognizer.velocity(in: self)
+        return fabs(velocity.y) <= fabs(velocity.x)
+    }
     
     //MARK: Configurations
     func configure(_ view: UIView, overlayView: OverlayView?) {
