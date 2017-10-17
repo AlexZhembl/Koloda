@@ -50,7 +50,11 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     public var rotationAngle = defaultRotationAngle
     public var scaleMin = defaultScaleMin
 
-    weak var delegate: DraggableCardDelegate?
+    weak var delegate: DraggableCardDelegate? {
+        didSet {
+            configureSwipeSpeed()
+        }
+    }
 
     private var overlayView: OverlayView?
     private(set) var contentView: UIView?
@@ -213,8 +217,14 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
         }
     }
 
+    func configureSwipeSpeed() {
+        if let delegate = delegate {
+            cardSwipeActionAnimationDuration = delegate.card(cardSwipeSpeed: self).rawValue
+        }
+    }
+
     //MARK: GestureRecognizers
-    func panGestureRecognized(_ gestureRecognizer: UIPanGestureRecognizer) {
+    @objc func panGestureRecognized(_ gestureRecognizer: UIPanGestureRecognizer) {
         dragDistance = gestureRecognizer.translation(in: self)
 
         let touchLocation = gestureRecognizer.location(in: self)
@@ -267,13 +277,13 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if let view = touch.view, view.isKind(of: UIButton.self) {
+        if let touchView = touch.view, let _ = touchView as? UIControl {
             return false
         }
         return delegate?.card(cardShouldDrag: self) ?? true
     }
 
-    func tapRecognized(_ recogznier: UITapGestureRecognizer) {
+    @objc func tapRecognized(_ recogznier: UITapGestureRecognizer) {
         delegate?.card(cardWasTapped: self)
     }
 
@@ -348,7 +358,6 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     private func animationRotationForDirection(_ direction: SwipeResultDirection) -> CGFloat {
         return CGFloat(direction.bearing / 2.0 - Double.pi / 4)
     }
-
 
     private func swipeAction(_ direction: SwipeResultDirection) {
         overlayView?.overlayState = direction
@@ -439,4 +448,3 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
         }
     }
 }
-
